@@ -11,6 +11,7 @@ uvicorn = "*"
 coverage = "*"
 pytest = "*"
 pytest-cov = "*"
+httpx = "*"
 
 [requires]
 python_version = "3.11"
