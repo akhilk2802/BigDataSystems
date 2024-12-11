@@ -1,4 +1,4 @@
 # BigDataSystems
 
 
-### Playing aroung with bigdata systems and MLOps
+### Playing around with bigdata systems and MLOps
