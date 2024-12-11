@@ -12,6 +12,7 @@ coverage = "*"
 pytest = "*"
 pytest-cov = "*"
 httpx = "*"
+pandas = "*"
 
 [requires]
 python_version = "3.11"
