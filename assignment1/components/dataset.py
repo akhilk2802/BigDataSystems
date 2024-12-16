@@ -6,6 +6,6 @@ import streamlit as st
 def load_gaia_dataset():
     dataset = load_dataset("gaia-benchmark/GAIA", "2023_all")
     available_splits = list(dataset.keys())
-    st.sidebar.write(f"Available Splits: {available_splits}")
+    # st.sidebar.write(f"Available Splits: {available_splits}")
     test_data = pd.DataFrame(dataset['validation'])
     return test_data

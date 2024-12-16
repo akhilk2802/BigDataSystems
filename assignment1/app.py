@@ -1,6 +1,6 @@
 import streamlit as st
 import json
-from components.evaluation import evaluate_model
+from components.evaluation import evaluate_model, evaluate_model_bert
 from components.feedback import display_feedback_form, save_evaluation_results
 from components.metrics import display_evaluation_metrics, show_evaluation_report
 from components.dataset import load_gaia_dataset
@@ -16,7 +16,6 @@ st.sidebar.header("Select Evaluation Test Case")
 # Load Dataset
 test_data = load_gaia_dataset()
 
-# st.write("Available Columns:", test_data.columns)
 
 # Test Case Selection
 test_case = st.sidebar.selectbox(
@@ -37,8 +36,8 @@ selected_row_json = json.dumps(selected_row_dict, indent=4)
 
 
 if not selected_row.empty:
-    st.subheader("Test Case Details")
-    st.write(selected_row)
+    # st.subheader("Test Case Details")
+    st.write("Selected test Question: ", selected_row['Question'].values[0])
 else:
     st.error("Selected Question not found in the dataset.")
 
@@ -49,11 +48,20 @@ annotator_metadata = selected_row['Annotator Metadata'].values[0]
 
 
 # Model Evaluation
+if st.button("Evaluate with BERT"):
+    model_response, correct_answer = evaluate_model_bert(test_data, test_case, annotator_metadata)
+    if model_response and correct_answer:
+        st.write("Model Response: ", model_response)
+        st.write("Correct Answer:", correct_answer)
+
+        display_evaluation_metrics(test_case, correct_answer, model_response)
+        display_feedback_form(test_case, correct_answer, model_response)
+
 if st.button("Evaluate with OpenAI"):
     model_response, correct_answer = evaluate_model(test_data, test_case, annotator_metadata)
     # display_evaluation_metrics(test_case, correct_answer, model_response)
     # display_feedback_form(test_case, correct_answer, model_response)
 
 # Show Evaluation Report
-# if st.checkbox("Show Evaluation Summary Report"):
-    # show_evaluation_report()
+if st.checkbox("Show Evaluation Summary Report"):
+    show_evaluation_report()

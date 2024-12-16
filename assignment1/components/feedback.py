@@ -22,9 +22,14 @@ def save_evaluation_results(test_case, correct_answer, model_response, user_feed
 
     feedback_df = pd.DataFrame([feedback_data])
 
+    # Check if file exists before reading
     if os.path.exists(FEEDBACK_FILE):
-        existing_data = pd.read_csv(FEEDBACK_FILE)
-        feedback_df = pd.concat([existing_data, feedback_df], ignore_index=True)
-
+        try:
+            existing_data = pd.read_csv(FEEDBACK_FILE)
+            feedback_df = pd.concat([existing_data, feedback_df], ignore_index=True)
+        except pd.errors.EmptyDataError:
+            st.warning("Feedback file is empty, creating a new file.")
+    
+    # Save to CSV
     feedback_df.to_csv(FEEDBACK_FILE, index=False)
     st.success("Evaluation Results Saved!")
