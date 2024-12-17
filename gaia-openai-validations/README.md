@@ -26,7 +26,7 @@ This part of the project is a Model Evaluation Tool built using Streamlit, integ
 1. Clone repository:
    ```bash
    git clone https://github.com/akhilk2802/BigDataSystems.git
-   cd assignment1
+   cd gaia-openai-validations
    ```
 2. Create a Virtual Environment
    ```bash
