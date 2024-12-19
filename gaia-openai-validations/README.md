@@ -1,6 +1,8 @@
-## Model Evaluation tool using streamlit
+## GAIA ETL Pipeline - Data Processing and Model Evaluation
 
-This part of the project is a Model Evaluation Tool built using Streamlit, integrating Hugging Face’s BERT-based model (deepset/bert-base-cased-squad2) for question-answering tasks. The system evaluates model responses against test cases from the GAIA dataset, compares predictions with the expected answers, and collects user feedback.
+### Project Overview
+
+This project focuses on building a robust ETL (Extract, Transform, Load) pipeline using AWS services like RDS, S3, and PostgreSQL, integrated with Hugging Face’s GAIA dataset. The application processes metadata, files, and annotations, stores them securely in AWS infrastructure, and facilitates interactions via a Streamlit-powered web interface.
 
 
 ### The application provides:
@@ -12,6 +14,7 @@ This part of the project is a Model Evaluation Tool built using Streamlit, integ
 5. Evaluation Report: Displays all evaluation results in a tabular format.
 
 
+
 ### libraries used: 
 - Streamlit - Web Framework for UI
 - Transformers - Hugging Face Model Integration
@@ -20,6 +23,20 @@ This part of the project is a Model Evaluation Tool built using Streamlit, integ
 - Evaluate - Model Metrics (BLEU Score)
 - Huggingface Hub - Authentication and API Management
 - Python-dotenv - Environment Variable Management
+
+ETL Pipeline Flow
+
+1. Extract
+	•	Data is extracted from Hugging Face’s GAIA dataset using the Hugging Face Hub API.
+
+2. Transform
+	•	Annotator Metadata and file information are cleaned and transformed using pandas.
+	•	Data is converted to SQL and uploaded to AWS RDS.
+
+3. Load
+	•	Metadata is stored in PostgreSQL on AWS RDS.
+	•	Files are uploaded to AWS S3.
+	•	File paths and metadata URLs are updated in PostgreSQL.
 
 ### Installation and Setup:
 
@@ -38,8 +55,21 @@ This part of the project is a Model Evaluation Tool built using Streamlit, integ
    ```bash
    pip install -r requirements.txt
    ```
+4. Create .env file
+   ```bash
+   HF_TOKEN=
+   OPEN_AI_TOKEN=
+   AWS_PROFILE=
+   AWS_RDS_HOST=
+   AWS_RDS_USERNAME=
+   AWS_RDS_PASSWORD=
+   AWS_RDS_DB_PORT=
+   AWS_RDS_DATABASE=
+   AWS_S3_BUCKET=
+   ```
 
 ### Running the application:
 ```bash
+python components/data_storage.py
 streamlit run app.py
 ```
