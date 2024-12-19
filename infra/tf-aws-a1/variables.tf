@@ -41,3 +41,29 @@ variable "aws_region" {
   type        = string
   default     = "us-east-1"
 }
+
+variable "region" {
+  description = "AWS region"
+  type        = string
+  default     = "us-east-1"
+}
+
+variable "vpc_cidr" {
+  description = "CIDR block for the VPC"
+  type        = string
+}
+
+variable "private_subnet_cidrs" {
+  description = "CIDR blocks for the private subnets"
+  type        = list(string)
+
+}
+# variable "public_subnet_cidrs" {
+#   description = "CIDR blocks for the public subnets"
+#   type        = list(string)
+# }
+variable "s3_bucket_name" {
+  description = "Name of the S3 bucket"
+  type        = string
+  default     = "assignment1-s3-bucket"
+}

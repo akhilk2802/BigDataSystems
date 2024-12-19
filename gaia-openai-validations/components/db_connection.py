@@ -1,7 +1,7 @@
 import os
 import psycopg2
 from psycopg2 import sql, OperationalError
-from project_logging import logging_module
+# from project_logging.logging_module import log_info, log_success, log_warning, log_error, log_critical
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -32,11 +32,11 @@ def get_db_connection():
             port=aws_rds_port,
             dbname=aws_rds_database
         )
-        logging_module.log_success("PostgreSQL connection established.")
+        # log_success("PostgreSQL connection established.")
         print("[SUCCESS]: PostgreSQL connection established.")
         return conn
 
     except OperationalError as e:
-        logging_module.log_error(f"Unable to connect to the PostgreSQL database. Details: {e}")
+        # log_error(f"Unable to connect to the PostgreSQL database. Details: {e}")
         print(f"[ERROR]: Unable to connect to the PostgreSQL database. Details: {e}")
         raise

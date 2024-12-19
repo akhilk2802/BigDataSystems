@@ -4,9 +4,11 @@ from huggingface_hub import login
 import json
 from db_connection import get_db_connection
 from dotenv import load_dotenv
-from project_logging.etl_logging import log_etl_info, log_etl_success, log_etl_warning, log_etl_error, log_etl_critical
+from etl_logging import log_etl_info, log_etl_success, log_etl_warning, log_etl_error, log_etl_critical
 from sqlalchemy import create_engine, text
 import boto3
+import psycopg2
+from psycopg2.extras import DictCursor
 import requests
 
 
@@ -18,24 +20,36 @@ huggingface_token = os.getenv('HF_TOKEN')
 aws_rds_host = os.getenv('AWS_RDS_HOST')
 aws_rds_user = os.getenv('AWS_RDS_USERNAME')
 aws_rds_password = os.getenv('AWS_RDS_PASSWORD')
-aws_rds_port = os.getenv('AWS_RDS_DB_PORT', '5432')
+aws_rds_port = os.getenv('AWS_RDS_DB_PORT')
 aws_rds_database = os.getenv('AWS_RDS_DATABASE')
 aws_s3_bucket = os.getenv('AWS_S3_BUCKET')
-aws_s3_region = os.getenv('AWS_S3_REGION')
-aws_s3_access_key = os.getenv('AWS_S3_ACCESS_KEY')
-aws_s3_secret_key = os.getenv('AWS_S3_SECRET_KEY')
-aws_s3_endpoint_url = os.getenv('AWS_S3_ENDPOINT_URL')
+aws_profile = os.getenv('AWS_PROFILE')
 
 # login to huggingface
 login(token=huggingface_token)
 
-# connect to db
+# connect to db 
 try:
+    print("RDS host:", aws_rds_host)
+    print("RDS port:", aws_rds_port)
     connection_string = f"postgresql+psycopg2://{aws_rds_user}:{aws_rds_password}@{aws_rds_host}:{aws_rds_port}/{aws_rds_database}"
     engine = create_engine(connection_string)
     log_etl_success("PostgreSQL connection engine created successfully.")
 except Exception as e:
     log_etl_error(f"Failed to create PostgreSQL connection engine. Error: {e}")
+    raise
+
+
+# SQL Query to create the schema if it doesn't exist
+create_schema_query = f"CREATE SCHEMA IF NOT EXISTS assignment1;"
+
+# Execute the schema creation query
+try:
+    with engine.connect() as connection:
+        connection.execute(text(create_schema_query))
+        log_etl_success(f"Schema assignment1 created successfully or already exists.")
+except Exception as e:
+    log_etl_error(f"Error creating schema 'assignment1': {e}")
     raise
 
 #login with huggingface token
@@ -66,7 +80,7 @@ try:
 
     # convert the dataframe to sql table
     validation_df.to_sql(
-        schema='assignment1',
+        schema="assignment1",
         name='gaia_metadata_tbl',
         con=engine,
         if_exists='replace',
@@ -82,25 +96,24 @@ ALTER TABLE assignment1.gaia_metadata_tbl
 ADD COLUMN IF NOT EXISTS s3_url VARCHAR(255),
 ADD COLUMN IF NOT EXISTS file_extension VARCHAR(255);
 """
-
-# Execute the ALTER TABLE Query
 try:
-    with engine.connect() as connection:
-        connection.execute(text(alter_table_query))
-        log_etl_success("Columns 's3_url' and 'file_extension' added successfully.")
-except Exception as e:
+    # Establish connection
+    connection = get_db_connection()
+    cursor = connection.cursor()
+
+    # Execute the ALTER TABLE query
+    cursor.execute(alter_table_query)
+    connection.commit()
+
+    log_etl_success("Columns 's3_url' and 'file_extension' added successfully.")
+except psycopg2.Error as e:
     log_etl_error(f"Error altering table to add columns: {e}")
     raise
 
 try:
-    # Initialize S3 Client
-    s3 = boto3.client(
-        's3',
-        aws_access_key_id=aws_s3_access_key,
-        aws_secret_access_key=aws_s3_secret_key,
-        region_name=aws_s3_region,
-        endpoint_url=aws_s3_endpoint_url  # Optional, if using custom S3 service
-    )
+
+    session = boto3.Session(profile_name=aws_profile)
+    s3 = session.client('s3')
     log_etl_success("Connected to AWS S3 bucket successfully.")
 except Exception as e:
     log_etl_error(f"Error connecting to AWS S3: {e}")
@@ -114,7 +127,7 @@ try:
     headers = {"Authorization": f"Bearer {huggingface_token}"}
 
     if connection:
-        cursor = connection.cursor(dictionary=True)
+        cursor = connection.cursor(cursor_factory=DictCursor)
 
         # Fetch records with non-null file_name
         select_query = "SELECT * FROM assignment1.gaia_metadata_tbl WHERE trim(file_name) != ''"
@@ -171,9 +184,9 @@ except Exception as e:
 
 finally:
     try:
-        if connection and connection.is_connected():
+        if connection and connection.closed == 0:
             cursor.close()
             connection.close()
-            log_etl_success("PostgreSQL connection is closed.")
+            log_etl_success("PostgreSQL connection closed.")
     except Exception as e:
         log_etl_error(f"Error closing PostgreSQL connection: {e}")
