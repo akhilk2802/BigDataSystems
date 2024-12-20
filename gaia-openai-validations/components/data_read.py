@@ -19,7 +19,7 @@ def fetch_data_from_db() -> pd.DataFrame:
             log_info("Connected to the PostgreSQL database.")
 
             mydata = conn.cursor()
-            mydata.execute("SELECT * FROM gaia_metadata_tbl")
+            mydata.execute("SELECT * FROM assignment1.gaia_metadata_tbl")
 
             result = mydata.fetchall()
             log_success("Data fetched from gaia_metadata_tbl successfully.")

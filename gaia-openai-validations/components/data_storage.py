@@ -40,14 +40,35 @@ except Exception as e:
     raise
 
 
-# SQL Query to create the schema if it doesn't exist
-create_schema_query = f"CREATE SCHEMA IF NOT EXISTS assignment1;"
+# # SQL Query to create the schema if it doesn't exist
+# create_schema_query = f"CREATE SCHEMA IF NOT EXISTS assignment1;"
 
-# Execute the schema creation query
+# # Execute the schema creation query
+# try:
+#     with engine.connect() as connection:
+#         connection.execute(text(create_schema_query))
+#         log_etl_success(f"Schema assignment1 created successfully or already exists.")
+# except Exception as e:
+#     log_etl_error(f"Error creating schema 'assignment1': {e}")
+#     raise
+
+
+# Change the PostgreSQL user to 'damg7245'
+change_user_query = "SET SESSION AUTHORIZATION damg7245;"
+
+# SQL Query to create the schema if it doesn't exist
+create_schema_query = "CREATE SCHEMA IF NOT EXISTS assignment1;"
+
 try:
     with engine.connect() as connection:
+        # Change the session user
+        connection.execute(text(change_user_query))
+        log_etl_success("Session authorization changed to 'damg7245' successfully.")
+        
+        # Execute the schema creation query
         connection.execute(text(create_schema_query))
-        log_etl_success(f"Schema assignment1 created successfully or already exists.")
+        log_etl_success("Schema 'assignment1' created successfully or already exists.")
+        
 except Exception as e:
     log_etl_error(f"Error creating schema 'assignment1': {e}")
     raise
