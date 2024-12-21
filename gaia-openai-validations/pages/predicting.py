@@ -4,9 +4,17 @@ import os
 import pandas as pd
 from components.data_read import fetch_data_from_db, fetch_data_from_db_dashboards
 from project_logging.logging_module import log_info, log_error, log_success
-from components.data_s3 import generate_presigned_url, parse_s3_url
+from components.data_s3 import generate_presigned_url, parse_s3_url, download_file
 import requests
+from openai.opeanai_client import OpenAIClient
+from openai.openai_methods import ask_gpt, answer_validation_check
+
 import tempfile
+from dotenv import load_dotenv
+
+load_dotenv()
+
+openai_api_key = os.getenv("OPENAI_API_KEY")
 
 st.set_page_config(page_title="Predicting", layout="wide")
 
@@ -18,6 +26,16 @@ if "data_frame" not in st.session_state:
         log_error(f"Error loading data from the database: {e}")
         st.error("Error loading data from the database.")
         st.stop()
+
+if "openai_client" not in st.session_state:
+    try:
+        st.session_state["openai_client"] = OpenAIClient(api_key=openai_api_key)
+        log_info("OpenAI Client initialized successfully.")
+    except Exception as e:
+        log_error(f"Error initializing OpenAI Client: {e}")
+        st.error("Error initializing OpenAI Client.")
+        st.stop()
+
 
 
 st.sidebar.header("Filter Options")
@@ -48,6 +66,12 @@ else:
         ["Select a question..."] + filtered_data['Question'].dropna().unique().tolist(), 
         index=0
     )
+
+gpt_models = {
+    "GPT-4o": "Optimized for large contexts",
+    "GPT-4": "Accurate but slower",
+    "GPT-3.5-turbo": "Faster but less accurate",
+}
 
     # Check if a question is selected
 if selected_question != "Select a question...":
@@ -97,19 +121,52 @@ if selected_question != "Select a question...":
         except Exception as e:
             st.error(f"Error when downloading: {e}")
 
-    st.subheader("Prompt with GPT")
+    col1, col2 = st.columns(2)
+    with col1:
+        selected_model = st.selectbox(
+            "Select GPT Model",
+            options=["Select a model..."] + [f"{model} - {desc}" for model, desc in gpt_models.items()],
+            index=0,
+            key="gpt_model_selection"
+        )
+
+    if selected_model != "Select a model...":
+        model_name = selected_model.split(" - ")[0]
+    else:
+        model_name = None
+
+
+    # Display error if no model is selected
+    if model_name is None:
+        st.error("Please select a GPT model before proceeding.")
+
+    # Ask GPT Button
     if st.button("Ask GPT"):
-        try:
-            # Call GPT function here (mock or real implementation)
-            st.info("Processing your request...")
+        if model_name:
+            st.success(f"You have selected {model_name} for the query.")
 
-            # Example function call - Replace this with actual GPT query logic
-            gpt_response = "This is a mock response from GPT-4."
-            st.success("GPT Response received successfully!")
-            
-            # Display the GPT response
-            st.text_area("GPT Response:", gpt_response, height=150, disabled=True)
-
-        except Exception as e:
-            st.error(f"Error querying GPT: {e}")
+            file_details = None
+            if not pd.isna(s3_url):
+                file_details = download_file(s3_url)
+                if "error" in file_details:
+                    st.error(file_details["error"])
+                    st.stop()
+            if file_details and file_details['extension'] == ".mp3":  
+                system_content = st.session_state.openai_client.audio_system_content
+                format_type = 1
+            else:
+                system_content = st.session_state.openai_client.val_system_content
+                format_type = 0
+            ai_response = ask_gpt(st.session_state.openai_client, system_content, selected_question, format_type, selected_model, file_details)
+            if "Error" in ai_response:
+                st.error(ai_response)
+            else:
+                st.subheader("GPT Response")
+                st.text_area("Response:", ai_response, height=200)
+                if answer_validation_check(final_answer, ai_response):
+                    st.success("The response is correct!")
+                else:
+                    st.error("The response is incorrect.")
+        else:
+            st.error("Please select a GPT model before proceeding.")
 

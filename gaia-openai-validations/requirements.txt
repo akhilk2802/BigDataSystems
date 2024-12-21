@@ -35,7 +35,7 @@ multidict==6.1.0
 multiprocess==0.70.16
 narwhals==1.18.4
 numpy==2.2.0
-openai==0.27.8
+openai==1.13.3
 packaging==24.2
 pandas==2.2.3
 pillow==11.0.0

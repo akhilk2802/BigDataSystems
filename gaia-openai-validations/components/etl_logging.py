@@ -4,7 +4,7 @@ from datetime import datetime
 import os
 
 # Create Log Directory
-LOG_DIR = "logs"
+LOG_DIR = "etl_logs"
 if not os.path.exists(LOG_DIR):
     os.makedirs(LOG_DIR)
 
