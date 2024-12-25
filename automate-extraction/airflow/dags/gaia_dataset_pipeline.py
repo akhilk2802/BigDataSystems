@@ -9,8 +9,9 @@ from scripts.setup_db import setup_db
 from scripts.login_hf import login_hf
 from scripts.process_dataset import process_dataset
 from scripts.df_to_sql import df_to_sql
+from scripts.alter_table import alter_table
+from scripts.fetch_download_records import fetch_download_records
 from utils.config import DATABSE_CONFIG as db_conf
-from utils.logging_module import log_info, log_success, log_warning, log_error, log_critical
 
 default_args = {
     'owner': 'airflow',
@@ -61,5 +62,18 @@ load_to_sql_task = PythonOperator(
     dag=dag,
 )
 
+alter_table_task = PythonOperator(
+    task_id='alter_table',
+    python_callable=alter_table,
+    dag=dag,
+)
 
-setup_db_task >> login_hf_task >> process_dataset_task >> load_to_sql_task
+fetch_download_records_task = PythonOperator(
+    task_id='fetch_download_records',
+    python_callable=fetch_download_records,
+    dag=dag,
+)
+
+
+setup_db_task >> login_hf_task >> process_dataset_task >> load_to_sql_task >> alter_table_task
+alter_table_task >> fetch_download_records_task

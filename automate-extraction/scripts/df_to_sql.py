@@ -17,12 +17,12 @@ def df_to_sql(dataframe_path: str, schema: str, table_name: str, db_config: dict
         # Log DataFrame preview
         log_success(f"DataFrame preview: {dataframe.head()}")
 
-        connection = engine.connect()
+        
         # Write DataFrame to SQL table
         dataframe.to_sql(
         schema=schema,
         name=table_name,
-        con=connection,
+        con=engine,
         if_exists='replace',
         index=False
         )
