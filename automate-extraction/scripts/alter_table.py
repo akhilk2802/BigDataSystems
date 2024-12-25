@@ -8,6 +8,8 @@ def alter_table():
     ALTER TABLE assignment2.gaia_dataset_tbl
     ADD COLUMN IF NOT EXISTS s3_url VARCHAR(255),
     ADD COLUMN IF NOT EXISTS file_extension VARCHAR(255);
+    ADD COLUMN IF NOT EXISTS s3_url_extracted_unstructured VARCHAR(255);
+    ADD COLUMN IF NOT EXISTS s3_url_extracted_pypdf VARCHAR(255);
     """
 
     try:

@@ -15,7 +15,7 @@ variable "availability_zones" {
 variable "database_name" {
   description = "Name of the PostgreSQL database"
   type        = string
-  default     = "assignment1_db"
+  default     = "assignment2_db"
 }
 
 variable "db_username" {
@@ -65,5 +65,5 @@ variable "private_subnet_cidrs" {
 variable "s3_bucket_name" {
   description = "Name of the S3 bucket"
   type        = string
-  default     = "assignment1-s3-bucket"
+  default     = "assignment2-s3-bucket"
 }

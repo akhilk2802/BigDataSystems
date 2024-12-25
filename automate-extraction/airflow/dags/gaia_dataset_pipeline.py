@@ -11,6 +11,8 @@ from scripts.process_dataset import process_dataset
 from scripts.df_to_sql import df_to_sql
 from scripts.alter_table import alter_table
 from scripts.fetch_download_records import fetch_download_records
+from scripts.fetch_download_pdfs import fetch_download_pdfs
+from scripts.extract_text_from_pdfs import extract_text_from_pdfs
 from utils.config import DATABSE_CONFIG as db_conf
 
 default_args = {
@@ -71,6 +73,18 @@ alter_table_task = PythonOperator(
 fetch_download_records_task = PythonOperator(
     task_id='fetch_download_records',
     python_callable=fetch_download_records,
+    dag=dag,
+)
+
+fetch_pdfs_task = PythonOperator(
+    task_id='fetch_download_pdfs',
+    python_callable=fetch_download_pdfs,
+    dag=dag,
+)
+
+extract_text_task = PythonOperator(
+    task_id='text_extraction',
+    python_callable=extract_text_from_pdfs,
     dag=dag,
 )
 
