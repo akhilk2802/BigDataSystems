@@ -1,4 +1,4 @@
 # BigDataSystems
 
 
-### Playing around with bigdata systems and MLOps
+### Playing around with ETL pipelines and MlOps

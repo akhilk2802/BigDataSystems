@@ -33,7 +33,7 @@ def fetch_download_pdfs():
             presigned_url = convert_s3_url_to_presigned(AWS_CONFIG['s3_bucket'], s3_url)
             response = requests.get(presigned_url)
 
-            download_dir = "../../downloaded_pdfs"
+            download_dir = "../downloaded_pdfs"
             os.makedirs(download_dir, exist_ok=True)
             file_path = f"{download_dir}/{file_name}"
 

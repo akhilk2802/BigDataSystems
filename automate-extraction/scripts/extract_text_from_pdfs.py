@@ -10,14 +10,14 @@ def extract_text_from_pdfs():
     extracted_texts = []
     
 
-    output_dir_pypdf = "../../automate-extraction/extracted_texts/pypdf"
+    output_dir_pypdf = "../automate-extraction/extracted_texts/pypdf"
     os.makedirs(output_dir_pypdf, exist_ok=True)
 
-    output_dir_unstructured = "../../automate-extraction/extracted_texts/pypdf"
+    output_dir_unstructured = "../automate-extraction/extracted_texts/pypdf"
     os.makedirs(output_dir_unstructured, exist_ok=True)
 
     # Directory where the PDFs are downloaded
-    pdf_dir = "../../downloaded_pdfs"
+    pdf_dir = "../downloaded_pdfs"
     
     for file in os.listdir(pdf_dir):
         if file.endswith('.pdf'):
