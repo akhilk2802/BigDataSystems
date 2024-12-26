@@ -7,12 +7,18 @@ def upload_extracted_text():
     try:
         session = boto3.Session(profile_name=AWS_CONFIG['profile'])
         s3 = session.client('s3')
-        # directory where the extracted text files are saved
-        extract_text_dir = "../extracted_texts"
-        for file in os.listdir(extract_text_dir):
-            if file.endswith('.json'):
-                s3.upload_file(file, AWS_CONFIG['s3_bucket'], f"extracted_text/{file}")
-                log_info(f"Uploaded {file} to S3")
+        
+        # Directories for extracted text files
+        directories = {
+            "pypdf": "../extracted_texts/pypdf",
+            "unstructured": "../extracted_texts/unstructured"
+        }
+        for tool, directory in directories.items():
+            for file in os.listdir(directory):
+                if file.endswith('.json'):
+                    file_path = os.path.join(directory, file)
+                    s3_key = f"extracted_text/{tool}/{file}"
+                    s3.upload_file(file_path, AWS_CONFIG['s3_bucket'], s3_key)
+                    log_info(f"Uploaded {file} from {tool} to S3 at {s3_key}")
     except Exception as e:
         log_error(f"Error uploading to S3: {e}")
-        raise

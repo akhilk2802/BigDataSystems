@@ -1,8 +1,8 @@
 import pandas as pd
 import json
 from datasets import load_dataset
+import os
 from utils.logging_module import log_info, log_success, log_warning, log_error, log_critical
-from utils.config import DATABSE_CONFIG as db_config
 
 
 def process_dataset():
@@ -29,7 +29,18 @@ def process_dataset():
         log_info("Annotator Metadata column converted to json string.")
 
         # store the dataframe to directory
+        # dataframe_path = "utils/data/gaia_dataset.csv"
+        # combined_df.to_csv(dataframe_path, index=False)
+        # log_success(f"Dataset saved to {dataframe_path}.")
         dataframe_path = "utils/data/gaia_dataset.csv"
+        data_directory = os.path.dirname(dataframe_path)
+
+        # Check and create the directory if it doesn't exist
+        if not os.path.exists(data_directory):
+            os.makedirs(data_directory)
+            log_success(f"Directory {data_directory} created.")
+
+        # Save the dataframe to the file
         combined_df.to_csv(dataframe_path, index=False)
         log_success(f"Dataset saved to {dataframe_path}.")
     except Exception as e:

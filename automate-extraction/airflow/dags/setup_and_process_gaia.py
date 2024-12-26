@@ -3,6 +3,7 @@ from airflow.operators.python_operator import PythonOperator
 from datetime import datetime, timedelta
 import sys
 import os
+
 sys.path.append('/Users/akhil/Desktop/projects-akhil/BigDataSystems/automate-extraction/')
 
 from scripts.setup_db import setup_db
@@ -11,12 +12,7 @@ from scripts.process_dataset import process_dataset
 from scripts.df_to_sql import df_to_sql
 from scripts.alter_table import alter_table
 from scripts.fetch_download_records import fetch_download_records
-from scripts.fetch_download_pdfs import fetch_download_pdfs
-from scripts.extract_text_from_pdfs import extract_text_from_pdfs
-from scripts.upload_extracted_text import upload_extracted_text
-from scripts.update_db import update_database
 from utils.config import DATABSE_CONFIG as db_conf
-
 
 default_args = {
     'owner': 'airflow',
@@ -28,13 +24,13 @@ default_args = {
 }
 
 dag = DAG(
-    'gaia_dataset_pipeline',
+    'setup_and_process_gaia',
     default_args=default_args,
-    description='A DAG to process GAIA dataset',
+    description='Setup and process GAIA dataset',
     schedule_interval=None,
     start_date=datetime(2024, 12, 1),
     catchup=False,
-    )
+)
 
 setup_db_task = PythonOperator(
     task_id='setup_db', 
@@ -79,30 +75,4 @@ fetch_download_records_task = PythonOperator(
     dag=dag,
 )
 
-fetch_pdfs_task = PythonOperator(
-    task_id='fetch_download_pdfs',
-    python_callable=fetch_download_pdfs,
-    dag=dag,
-)
-
-extract_text_task = PythonOperator(
-    task_id='text_extraction',
-    python_callable=extract_text_from_pdfs,
-    dag=dag,
-)
-
-upload_extracted_text_task = PythonOperator(
-    task_id='upload_extracted_text',
-    python_callable=upload_extracted_text,
-    dag=dag,
-)
-
-update_db_task = PythonOperator(
-    task_id='update_db',
-    python_callable=update_database,
-    dag=dag,
-)
-
-
-setup_db_task >> login_hf_task >> process_dataset_task >> load_to_sql_task >> alter_table_task
-alter_table_task >> fetch_download_records_task >> fetch_pdfs_task >> extract_text_task >> upload_extracted_text_task >> update_db_task
+setup_db_task >> login_hf_task >> process_dataset_task >> load_to_sql_task >> alter_table_task >> fetch_download_records_task

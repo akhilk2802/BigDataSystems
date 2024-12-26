@@ -3,6 +3,8 @@ from utils.logging_module import log_info, log_error
 from utils.config import AWS_CONFIG, DATABSE_CONFIG
 import boto3
 import psycopg2
+import os
+from psycopg2.extras import DictCursor
     
 def convert_s3_url_to_presigned(bucket_name, s3_url):
     try:
@@ -17,9 +19,12 @@ def convert_s3_url_to_presigned(bucket_name, s3_url):
 
 def fetch_download_pdfs():
     try:
+        execute_query = """
+            SELECT * FROM assignment2.gaia_dataset_tbl WHERE file_extension = 'pdf'
+        """
         connection = psycopg2.connect(**DATABSE_CONFIG)
-        cursor = connection.cursor()
-        cursor.execute("SELECT * FROM assignment2.gaia_dataset_tbl WHERE file_extension = 'pdf'")
+        cursor = connection.cursor(cursor_factory=DictCursor)
+        cursor.execute(execute_query)
         records = cursor.fetchall()
 
         for record in records:
@@ -28,9 +33,9 @@ def fetch_download_pdfs():
             presigned_url = convert_s3_url_to_presigned(AWS_CONFIG['s3_bucket'], s3_url)
             response = requests.get(presigned_url)
 
-            download_dir = "../downloaded_pdfs"
+            download_dir = "../../downloaded_pdfs"
+            os.makedirs(download_dir, exist_ok=True)
             file_path = f"{download_dir}/{file_name}"
-
 
             if response.status_code == 200:
                 with open(file_path, 'wb') as f:
