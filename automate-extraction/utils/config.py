@@ -11,6 +11,9 @@ aws_profile = os.getenv('AWS_PROFILE')
 hf_token = os.getenv('HF_TOKEN')
 aws_s3_bucket = os.getenv('AWS_S3_BUCKET')
 
+unstructured_api_key = os.getenv('UNSTRUCTURED_API_KEY')
+unstructured_api_url = os.getenv('UNSTRUCTURED_API_URL')
+
 
 DATABSE_CONFIG = {
     'host': aws_rds_host,
@@ -28,4 +31,9 @@ HF_CONFIG = {
 AWS_CONFIG = {
     'profile': aws_profile,
     's3_bucket': aws_s3_bucket
+}
+
+UNSTRUCTURED_CONFIG = {
+    'api_key': unstructured_api_key,
+    'api_url': unstructured_api_url
 }

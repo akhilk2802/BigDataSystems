@@ -1,6 +1,6 @@
 from PyPDF2 import PdfReader
-# from unstructured.partition.pdf import partition_pdf
-from unstructured.partition.auto import partition
+from unstructured.partition.pdf import partition_pdf
+# from unstructured.partition.auto import partition
 
 import os
 import json
@@ -10,10 +10,10 @@ def extract_text_from_pdfs():
     extracted_texts = []
     
 
-    output_dir_pypdf = "../automate-extraction/extracted_texts/pypdf"
+    output_dir_pypdf = "../extracted_texts/pypdf"
     os.makedirs(output_dir_pypdf, exist_ok=True)
 
-    output_dir_unstructured = "../automate-extraction/extracted_texts/pypdf"
+    output_dir_unstructured = "../extracted_texts/unstructured"
     os.makedirs(output_dir_unstructured, exist_ok=True)
 
     # Directory where the PDFs are downloaded
@@ -40,23 +40,10 @@ def extract_text_from_pdfs():
 
             except Exception as e:
                 log_error(f"Failed to extract text from {file} using PyPDF2: {e}")
-            
-            # try:
-            #     # Unstructured Library Extraction
-            #     unstructured_text = partition_pdf(filename=file_path)
-            #     unstructured_content = " ".join([elem.text for elem in unstructured_text if elem.text])
-                
-            #     # Save Unstructured extracted text
-            #     with open(unstructured_output_file, 'w') as f:
-            #         json.dump({"file_name": file, "text": unstructured_content}, f)
-            #     log_info(f"Extracted text from {file} using Unstructured to {unstructured_output_file}")
-            #     extracted_texts.append(unstructured_output_file)
-            # except Exception as e:
-            #     log_error(f"Failed to extract text from {file} using Unstructured: {e}")
 
             try:
                 # Unstructured Library Extraction
-                # unstructured_text = partition_pdf(filename=file_path)
+                unstructured_text = partition_pdf(filename=file_path)
                 unstructured_text = partition(filename=file_path)
                 unstructured_content = " ".join([elem.text for elem in unstructured_text if elem.text])
                 with open(unstructured_output_file, 'w') as f:

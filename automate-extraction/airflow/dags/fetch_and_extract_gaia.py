@@ -7,8 +7,9 @@ import os
 sys.path.append('/Users/akhil/Desktop/projects-akhil/BigDataSystems/automate-extraction/')
 
 from scripts.fetch_download_pdfs import fetch_download_pdfs
-from scripts.extract_text_from_pdfs import extract_text_from_pdfs
+from scripts.extract_text_pypdf import extract_text_pypdf
 from scripts.upload_extracted_text import upload_extracted_text
+from scripts.extract_text_unstructured import extract_text_unstructured
 from scripts.update_db import update_database
 
 default_args = {
@@ -36,9 +37,21 @@ fetch_pdfs_task = PythonOperator(
     dag=dag,
 )
 
-extract_text_task = PythonOperator(
-    task_id='text_extraction',
-    python_callable=extract_text_from_pdfs,
+# extract_text_task = PythonOperator(
+#     task_id='text_extraction',
+#     python_callable=extract_text_from_pdfs,
+#     dag=dag,
+# )
+
+extract_text_pypdf_task = PythonOperator(
+    task_id='extract_text_pypdf',
+    python_callable=extract_text_pypdf,
+    dag=dag,
+)
+
+extract_text_unstructured_task = PythonOperator(
+    task_id='extract_text_unstructured',
+    python_callable=extract_text_unstructured,
     dag=dag,
 )
 
@@ -54,4 +67,4 @@ update_db_task = PythonOperator(
     dag=dag,
 )
 
-fetch_pdfs_task >> extract_text_task >> upload_extracted_text_task >> update_db_task
+fetch_pdfs_task >> extract_text_pypdf_task >> extract_text_unstructured_task >>upload_extracted_text_task >> update_db_task

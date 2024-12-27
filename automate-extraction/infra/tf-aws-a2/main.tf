@@ -33,11 +33,32 @@ resource "aws_subnet" "public_subnets" {
   }
 }
 
+
+# Private Subnets in 3 Availability Zones
+resource "aws_subnet" "private_subnets" {
+  count                   = length(var.private_subnet_cidrs)
+  vpc_id                  = aws_vpc.vpc-01.id
+  cidr_block              = element(var.private_subnet_cidrs, count.index)
+  availability_zone       = element(var.availability_zones, count.index)
+  map_public_ip_on_launch = false
+  tags = {
+    Name = "private-subnet-${count.index + 1}"
+  }
+}
+
 # Public Route Table
 resource "aws_route_table" "public_route_table" {
   vpc_id = aws_vpc.vpc-01.id
   tags = {
     Name = "public-route-table"
+  }
+}
+
+# Private Route Table
+resource "aws_route_table" "private_route_table" {
+  vpc_id = aws_vpc.vpc-01.id
+  tags = {
+    Name = "private-route-table"
   }
 }
 
@@ -48,12 +69,15 @@ resource "aws_route" "public_route" {
   gateway_id             = aws_internet_gateway.ig-01.id
 }
 
+
+
 # Associate Public Subnets with Public Route Table
 resource "aws_route_table_association" "public_associations" {
   count          = length(var.public_subnet_cidrs)
   subnet_id      = aws_subnet.public_subnets[count.index].id
   route_table_id = aws_route_table.public_route_table.id
 }
+
 
 # Security Group for DB 
 resource "aws_security_group" "database-security-group" {
