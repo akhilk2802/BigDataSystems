@@ -14,6 +14,8 @@ aws_s3_bucket = os.getenv('AWS_S3_BUCKET')
 unstructured_api_key = os.getenv('UNSTRUCTURED_API_KEY')
 unstructured_api_url = os.getenv('UNSTRUCTURED_API_URL')
 
+azure_endpoint = os.getenv('AZURE_ENDPOINT')
+azure_api_key = os.getenv('AZURE_API_KEY')
 
 DATABSE_CONFIG = {
     'host': aws_rds_host,
@@ -36,4 +38,9 @@ AWS_CONFIG = {
 UNSTRUCTURED_CONFIG = {
     'api_key': unstructured_api_key,
     'api_url': unstructured_api_url
+}
+
+AZURE_CONFIG = {
+    'endpoint': azure_endpoint,
+    'api_key': azure_api_key
 }

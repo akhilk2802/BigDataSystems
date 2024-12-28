@@ -11,7 +11,7 @@ def upload_extracted_text():
         # Directories for extracted text files
         directories = {
             "pypdf": "../extracted_texts/pypdf",
-            "unstructured": "../extracted_texts/unstructured"
+            "azure": "../extracted_texts/azure"
         }
         for tool, directory in directories.items():
             for file in os.listdir(directory):

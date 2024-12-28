@@ -9,7 +9,7 @@ sys.path.append('/Users/akhil/Desktop/projects-akhil/BigDataSystems/automate-ext
 from scripts.fetch_download_pdfs import fetch_download_pdfs
 from scripts.extract_text_pypdf import extract_text_pypdf
 from scripts.upload_extracted_text import upload_extracted_text
-from scripts.extract_text_unstructured import extract_text_unstructured
+from scripts.extract_text_azure import extract_text_azure
 from scripts.update_db import update_database
 
 default_args = {
@@ -49,11 +49,14 @@ extract_text_pypdf_task = PythonOperator(
     dag=dag,
 )
 
-extract_text_unstructured_task = PythonOperator(
-    task_id='extract_text_unstructured',
-    python_callable=extract_text_unstructured,
+extract_text_azure_task = PythonOperator(
+    task_id='extract_text_azure',
+    python_callable=extract_text_azure,
     dag=dag,
+    execution_timeout=timedelta(minutes=10),
 )
+
+
 
 upload_extracted_text_task = PythonOperator(
     task_id='upload_extracted_text',
@@ -67,4 +70,4 @@ update_db_task = PythonOperator(
     dag=dag,
 )
 
-fetch_pdfs_task >> extract_text_pypdf_task >> extract_text_unstructured_task >>upload_extracted_text_task >> update_db_task
+fetch_pdfs_task >> extract_text_pypdf_task >> extract_text_azure_task >>upload_extracted_text_task >> update_db_task
