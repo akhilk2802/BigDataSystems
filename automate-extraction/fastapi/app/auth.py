@@ -3,10 +3,12 @@ from datetime import datetime, timedelta
 from jose.exceptions import JWTError
 from jose import jwt
 from passlib.context import CryptContext
+from dotenv import load_dotenv
+import os
+load_dotenv()
 
-# Secret Key and Algorithm
-SECRET_KEY = "SECRET"
-ALGORITHM = "HS256"
+SECRET_KEY = os.getenv("FAST_API_SECRET_KEY")
+ALGORITHM = os.getenv("FAST_API_ALGORITHM")
 
 # Password Hashing
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
