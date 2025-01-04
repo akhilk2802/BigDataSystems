@@ -9,7 +9,5 @@ if 'home_page' not in st.session_state:
     st.session_state.home_page = 'home' 
     log_success("NEW PROGRAM EXECUTION\n\n")
 
-
-
 st.title("OpenAI Benchmarking with GAIA Dataset")
 log_success("Application successfully rendered.")
