@@ -12,7 +12,6 @@ aws_db_host = os.getenv("AWS_RDS_HOST")
 aws_db_port = os.getenv("AWS_RDS_DB_PORT")
 aws_db_name = os.getenv("AWS_RDS_DATABASE")
 
-# DATABASE_URL = f"postgresql://{DATABASE_CONFIG['user']}:{DATABASE_CONFIG['password']}@{DATABASE_CONFIG['host']}:{DATABASE_CONFIG['port']}/{DATABASE_CONFIG['database']}"
 DATABASE_URL = f"postgresql://{aws_db_user}:{aws_db_password}@{aws_db_host}:{aws_db_port}/{aws_db_name}"
 
 engine = create_engine(DATABASE_URL)
