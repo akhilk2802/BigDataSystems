@@ -1,0 +1,24 @@
+services:
+  fastapi:
+    build: .
+    ports:
+      - "8000:8000"
+    command: uvicorn fastapi.app.main:app --host 0.0.0.0 --port 8000 --reload
+    volumes:
+      - .:/code
+    networks:
+      - app_network
+
+  streamlit:
+    build: .
+    ports:
+      - "8501:8501"
+    command: streamlit run streamlit/app/main.py --server.port 8501
+    volumes:
+      - .:/code
+    networks:
+      - app_network
+
+networks:
+  app_network:
+    driver: bridge
