@@ -4,6 +4,8 @@
 
 This project focuses on building a robust ETL (Extract, Transform, Load) pipeline using AWS services like RDS, S3, and PostgreSQL, integrated with Hugging Face’s GAIA dataset. The application processes metadata, files, and annotations, stores them securely in AWS infrastructure, and facilitates interactions via a Streamlit-powered web interface.
 
+Users can interactively select test cases, send them to OpenAI, and compare the AI-generated responses with predefined answers. If OpenAI’s response doesn’t match the expected outcome, users are given the flexibility to modify the validation steps and re-submit the question for another validation attempt.
+
 
 ### The application provides:
 
@@ -37,6 +39,22 @@ ETL Pipeline Flow
 	•	Metadata is stored in PostgreSQL on AWS RDS.
 	•	Files are uploaded to AWS S3.
 	•	File paths and metadata URLs are updated in PostgreSQL.
+
+### Project Flow
+
+#### Step 1: Selection of Test Cases
+- User selects a validation test case from the GAIA Dataset.
+- Predefined questions and answers from the metadata table are displayed for user reference.
+  
+#### Step 2: Sending Questions to OpenAI
+- User sends the selected question to OpenAI for response generation.
+- The response is then compared with the predefined answer.
+
+#### Step3: Validating the answer
+- If the response doesn’t match the expected outcome, the user is given the flexibility to modify the input steps.
+- The user can re-submit the question for another validation attempt.
+- If the Answer is right, it is saved to model response table.
+
 
 ### Installation and Setup:
 
@@ -73,3 +91,29 @@ ETL Pipeline Flow
 python components/data_storage.py
 streamlit run app.py
 ```
+
+### Setting up the Infra 
+1. Change Directory 
+   ```bash
+   cd infra/tf-aws-a1
+   ```
+2. Create ```terraform.tfvars``` with the following values 
+   ```bash
+   database_name       = ""
+   db_username         = ""
+   db_password         = ""
+   aws_region          = ""
+   aws_profile         = ""
+   public_subnet_cidrs = []
+   availability_zones  = []
+   region               = ""
+   vpc_cidr             = ""
+   private_subnet_cidrs = []
+   s3_bucket_name       = ""
+
+   ```
+3. Apply the variables and run 
+   ```bash
+   terraform init
+   terraform apply
+   ```
